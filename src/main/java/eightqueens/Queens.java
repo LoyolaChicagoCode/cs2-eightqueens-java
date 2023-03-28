@@ -14,27 +14,28 @@ public class Queens implements Iterator<int[]> {
   }
 
   /**
-   * Generates all possible constellations of n queens on distinct rows
+   * Generates all possible arrangements of n queens on distinct rows
    * and adds only the safe ones to the results list.
    */
   public void generateAndCheck(final int row, final List<int[]> results) {
     // TODO arg validation
-    if (row == positions.length) {
-      var safe = true;
+    if (row < positions.length) {
+      // recursively generate the next permutation
+      // by placing queens row-by-row
+      for (var col = 0; col < positions.length; col += 1) {
+        positions[row] = col;
+        generateAndCheck(row + 1, results);
+      }
+    } else {
+      // when we get to the bottom row, then we have just finished 
+      // a permutation and need to check whether it's a (safe) solution
       for (var r = 0; r < positions.length; r += 1) {
         if (!isSafe(r, positions[r])) {
-          safe = false;
-          break;
+          return;
         }
       }
-      if (safe) {
-        results.add(Arrays.copyOf(positions, positions.length));
-      }
-      return;
-    }
-    for (var col = 0; col < positions.length; col += 1) {
-      positions[row] = col;
-      generateAndCheck(row + 1, results);
+      // QUESTION why do we have to make a copy of the array?
+      results.add(Arrays.copyOf(positions, positions.length));
     }
   }
 
@@ -60,11 +61,13 @@ public class Queens implements Iterator<int[]> {
 
   /** Uses recursive backtracking directly to solve the n-queens problem. */
   private boolean solve(final int row) {
+    // if we've safely placed all queens, we have a(nother) solution
     if (row == positions.length) {
       return true;
     }
     // look for next available safe column starting with current one;
-    // effectively, this means we're starting with the current arrangement for the entire board
+    // effectively, this means we're starting just one step past the current solution
+    // (see also next() below)
     for (var col = positions[row]; col < positions.length; col += 1) {
       if (isSafe(row, col)) {
         positions[row] = col;
@@ -73,8 +76,9 @@ public class Queens implements Iterator<int[]> {
         }
       }
     }
-    // couldn't place queen on this row
+    // QUESTION why do we need to reset this to 0?
     positions[row] = 0;
+    // couldn't safely place queen on this row
     return false;
   }
 
@@ -84,9 +88,11 @@ public class Queens implements Iterator<int[]> {
 
   public int[] next() {
     final var size = positions.length;
+    // QUESTION why do we have to make a copy of the array?
     final var result = Arrays.copyOf(positions, positions.length);
-    // move the bottom queen one square to the right, 
-    // wrapping around and propagating upward if necessary
+    // bump past the current solution by moving the bottom queen 
+    // one square to the right, wrapping around and propagating upward if necessary
+    // (like a carry when incrementing a number)
     for (var row = size - 1; row >= 0; row -= 1) {
       positions[row] += 1;
       if (positions[row] == size) {

@@ -1,5 +1,5 @@
 compile = "mvn clean test-compile"
-run = "mvn test"
+run = "mvn exec:java -Dexec.args=4"
 entrypoint = "Main.java"
 hidden = ["target"]
 
