@@ -9,7 +9,7 @@ public class QueensUtil {
   public static boolean isSafe(final int[] positions, final int newRow, final int newCol) {
     for (var row = 0; row < newRow; row += 1) {
       final var col = positions[row];
-      if (col == newCol || Math.abs(col - newCol) == newRow - row) {
+      if (col == newCol || Math.abs(newCol - col) == newRow - row) {
         return false;
       }
     }
